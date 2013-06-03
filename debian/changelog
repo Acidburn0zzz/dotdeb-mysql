@@ -1,33 +1,40 @@
-mysql-5.5 (5.5.31-1~dotdeb.0) oldstable; urgency=low
+mysql-5.6 (5.6.11-1~dotdeb.1) stable; urgency=low
 
-  * New upstream release
+  * Rebuilt for Dotdeb against Wheezy
 
- -- Guillaume Plessis <gui@dotdeb.org>  Wed, 15 May 2013 21:43:42 -0700
+ -- Guillaume Plessis <gui@dotdeb.org>  Sun, 02 Jun 2013 22:17:42 -0700
 
-mysql-5.5 (5.5.30-1~dotdeb.0) stable; urgency=low
+mysql-5.6 (5.6.11+dfsg-1) UNRELEASED; urgency=low
 
-  * New upstream release
+  * new upstream release 
+  * mysql_install_db is now a perl script. Do not run it with bash
+  * added mysql-bug-68416.patch to disable my.cnf auto-generate during mysql_install_db 
+  * added innodb_data_file_path to my.cnf for mysql-5.1 => mysql-5.6 upgrade path
+  * added multiarch support 
 
- -- Guillaume Plessis <gui@dotdeb.org>  Tue,  5 Feb 2013 14:41:42 +0100
+ -- Bjoern Boschman <bjoern@boschman.de>  Tue, 05 Feb 2013 14:38:29 +0100
 
-mysql-5.5 (5.5.29-1~dotdeb.0) stable; urgency=low
+mysql-5.5 (5.5.25+dfsg-2) quantal; urgency=low
 
-  * New upstream release
+  [ Nicholas Bamber ]
+  * Made DFSG repacking mechanism independent of local installs and improved
+    the documentation
+  * Setting the gcc/g++ version to 4.4 on i386 platforms (Closes: #674267)
+    but see #678252 for follow up from upstream
+  * Danish debconf translation (Closes: #599483)
+  * Spanish debconf translation (Closes: #679053)
 
- -- Guillaume Plessis <gui@dotdeb.org>  Sat, 22 Dec 2012 09:44:42 +0200
+  [ Bjoern Boschman ]
+  * mysqld_safe is now running as User 'mysql' (Closes: 664639)
+  * logrotate now handles all /var/log/mysql/*log files
 
-mysql-5.5 (5.5.28-1~dotdeb.0) stable; urgency=low
+ -- Bjoern Boschman <bjoern.boschman@nfon.net>  Wed, 09 Jan 2013 11:15:29 +0100
 
-  * New upstream release
-
- -- Guillaume Plessis <gui@dotdeb.org>  Fri, 28 Sep 2012 23:35:42 +0200
-
-mysql-5.5 (5.5.25+dfsg-1) UNRELEASED; urgency=low
+mysql-5.5 (5.5.25+dfsg-1) experimental; urgency=low
 
   * Fixing regular expression in tests to guard against build path containing
     the '+' symbol (Closes: #674210)
-  * Setting the gcc/g++ version to 4.4 on i386 platforms (Closes: #674267)
-    but see #678252 for follow up from upstream
+  * Setting the gcc/g++ version to 4.5 on i386 platforms (cf. #674267)
   * Removed main_openssl_1 patch
   * Set SYSTEM_TYPE according to GNU Build System
   * In an effort to get a better handle on test coverage, made test failures
@@ -39,8 +46,6 @@ mysql-5.5 (5.5.25+dfsg-1) UNRELEASED; urgency=low
   * Updated Portuguese translation (Closes: #674953)
   * Updated Swedish translation (Closes: #675108)
   * Updated German translation (Closes: #675766)
-  * Danish debconf translation (Closes: #599483)
-  * Spanish debconf translation (Closes: #679053)
   * Migrated libmysqlclient-dev, mysql-client-5.5, mysql-server-core-5.5
     and mysql-server-5.5 off dh_movefiles
   * Removed dh_movefiles override
@@ -82,7 +87,7 @@ mysql-5.5 (5.5.25+dfsg-1) UNRELEASED; urgency=low
   * Added versioned dependency on initscripts and revert /var/run
     to /run change (Closes: #676560)
 
- -- Nicholas Bamber <nicholas@periapt.co.uk>  Tue, 08 May 2012 09:04:25 +0100
+ -- Nicholas Bamber <nicholas@periapt.co.uk>  Wed, 13 Jun 2012 16:09:54 +0100
 
 mysql-5.5 (5.5.23-2) unstable; urgency=low
 

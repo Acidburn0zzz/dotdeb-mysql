@@ -3,7 +3,7 @@
 export DH_VERBOSE=1
 export DEB_BUILD_HARDENING=1
 
-PACKAGE:=mysql-5.5
+PACKAGE:=mysql-5.6
 
 TMP:=$(CURDIR)/debian/tmp/
 
@@ -26,12 +26,13 @@ DEB_VERSION ?= $(shell dpkg-parsechangelog | egrep '^Version:' | cut -f 2 -d ' '
 DEB_NOEPOCH_VERSION ?= $(shell echo $(DEB_VERSION) | cut -d: -f2-)
 DEB_UPSTREAM_VERSION ?= $(shell echo $(DEB_NOEPOCH_VERSION) | sed 's/-[^-]*$$//')
 DEB_UPSTREAM_VERSION_MAJOR_MINOR := $(shell echo $(DEB_UPSTREAM_VERSION) | sed -r -n 's/^([0-9]+\.[0-9]+).*/\1/p')
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 
-EXPORTED_SOURCE_TARBALL := debian/mysql-source-5.5.tar.gz
+EXPORTED_SOURCE_TARBALL := debian/mysql-source-5.6.tar.gz
 
 DISTRIBUTION := $(shell lsb_release -i -s)
 
-MAKE_TEST_TARGET:=test-force
+MAKE_TEST_TARGET:=test
 ifneq ($(findstring fulltest,$(DEB_BUILD_OPTIONS)),)
 # make test-bt is the testsuite run by the MySQL build team 
 # before a release, but it is long
@@ -87,7 +88,7 @@ configure-stamp configure-pic-stamp:
 	    	CC=$${MYSQL_BUILD_CC:-gcc} \
 		CFLAGS=$${MYSQL_BUILD_CFLAGS:-"-O2 -DBIG_JOINS=1 ${FORCE_FPIC_CFLAGS} -fno-strict-aliasing"} \
 	    	CXX=$${MYSQL_BUILD_CXX:-g++} \
-	    	CXXFLAGS=$${MYSQL_BUILD_CXXFLAGS:-"-O3 -DBIG_JOINS=1 -felide-constructors -fno-exceptions -fno-rtti ${FORCE_FPIC_CFLAGS} -fno-strict-aliasing"} \
+	    	CXXFLAGS=$${MYSQL_BUILD_CXXFLAGS:-"-O3 -DBIG_JOINS=1 -felide-constructors -fno-exceptions -fpermissive -fno-rtti ${FORCE_FPIC_CFLAGS} -fno-strict-aliasing"} \
 	    cmake -DCMAKE_INSTALL_PREFIX=/usr \
 		-DCMAKE_VERBOSE_MAKEFILE=ON \
 		$(FORCE_FPIC) \
@@ -103,7 +104,7 @@ configure-stamp configure-pic-stamp:
 	    -DMYSQL_SERVER_SUFFIX="-$(DEBVERSION)" \
 	    -DSYSTEM_TYPE="debian-$(DEB_BUILD_GNU_SYSTEM)" \
 	    -DINSTALL_LAYOUT=RPM \
-	    -DINSTALL_LIBDIR=lib \
+	    -DINSTALL_LIBDIR=lib/$(DEB_HOST_MULTIARCH) \
 	    -DINSTALL_PLUGINDIR=lib/mysql/plugin \
         -DWITH_EMBEDDED_SERVER=ON \
         -DHAVE_EMBEDDED_PRIVILEGE_CONTROL=ON \
@@ -119,7 +120,7 @@ build-stamp:
 	@echo "RULES.$@"
 	[ -f $(EXPORTED_SOURCE_TARBALL) ] || tar -zcf $(EXPORTED_SOURCE_TARBALL) \
 	--exclude=debian . \
-	--transform="s,^\./,mysql-5.5/,"
+	--transform="s,^\./,mysql-5.6/,"
 	cd $(builddir) && $(MAKE)
 	touch $@
 
@@ -160,8 +161,8 @@ auto_install-stamp:
 	install -m 0644 -o root -g root $(BUILDDIR_PIC)/libmysqld/libmysqld.a $(TMP)/usr/lib/mysql/libmysqld_pic.a
 	# mysql_config won't report the -fPIC, so give libmysqld-pic users a way to get their flags
 	install -m 0755 -o root -g root $(BUILDDIR_PIC)/scripts/mysql_config $(TMP)/usr/bin/mysql_config_pic
-	mkdir -p $(TMP)/usr/share/doc/mysql-server-5.5
-	nm -n $(BUILDDIR)/sql/mysqld |gzip -9 > $(TMP)/usr/share/doc/mysql-server-5.5/mysqld.sym.gz
+	mkdir -p $(TMP)/usr/share/doc/mysql-server-5.6
+	nm -n $(BUILDDIR)/sql/mysqld |gzip -9 > $(TMP)/usr/share/doc/mysql-server-5.6/mysqld.sym.gz
 	# This seems to be the only safe place to fix permissions issues
         # not handled by dh_fixperms.
 	mkdir -p $(TMP)/etc/mysql/conf.d/
@@ -169,9 +170,8 @@ auto_install-stamp:
 	install -m 0755 debian/additions/echo_stderr $(TMP)/usr/share/mysql/
 	install -m 0755 debian/additions/debian-start $(TMP)/etc/mysql/
 	install -m 0755 debian/additions/debian-start.inc.sh $(TMP)/usr/share/mysql/
-	chmod 0755 $(TMP)/usr/share/mysql-test/lib/My/SafeProcess/my_safe_process
 	chmod 0755 $(TMP)/usr/share/mysql-test/std_data/checkDBI_DBD-mysql.pl
-	chmod 0644 $(TMP)/usr/share/mysql/*.ini
+	# chmod 0644 $(TMP)/usr/share/mysql/*.ini
 	chmod 0644 $(TMP)/usr/share/mysql-test/[rt]/*
 	chmod 0644 $(TMP)/usr/share/mysql-test/collections/default.weekly
 	chmod 0644 $(TMP)/usr/share/mysql-test/suite/innodb/[rt]/*
@@ -182,10 +182,10 @@ auto_install-stamp:
 #       Exclusion                                       Package         Type
 #       usr/share/man/                                  various         man
 #       libmysqlclient_r.so                             libMclient-dev  links
-#       usr/share/mysql/magic                           M-server-5.5    example
-#       usr/bin/mysqlaccess.conf                        M-client-5.5    example
-#       usr/lib/mysql/plugin/daemon_example.ini         M-server-5.5    example
-#       usr/share/mysql/my-                             M-server-5.5    example
+#       usr/share/mysql/magic                           M-server-5.6    example
+#       usr/bin/mysqlaccess.conf                        M-client-5.6    example
+#       usr/lib/mysql/plugin/daemon_example.ini         M-server-5.6    example
+#       usr/share/mysql/my-                             M-server-5.6    example
 # The following exclusions have been inherited from pre short form
 # debian/rules days.
 #        usr/share/mysql/mi_test_all
@@ -195,9 +195,10 @@ auto_install-stamp:
 override_dh_install:
 	dh_install --fail-missing                       \
         -Xusr/share/man/                                \
-        -Xusr/share/info/                               \
+        -Xusr/share/info/mysql.info                     \
         -Xlibmysqlclient_r.so                           \
         -Xusr/share/mysql/magic                         \
+	-Xusr/share/mysql/solaris/postinstall-solaris	\
         -Xusr/lib/mysql/plugin/daemon_example.ini       \
         -Xusr/bin/mysqlaccess.conf                      \
         -Xusr/share/mysql/mi_test_all                   \
@@ -227,7 +228,7 @@ override_dh_link-arch: libmysqlclient-links-stamp
 override_dh_installlogrotate-arch:
 	dh_installlogrotate --name mysql-server
 	if [ "$(DISTRIBUTION)" = "Ubuntu" ]; then \
-	  dh_apparmor -pmysql-server-5.5 --profile-name=usr.sbin.mysqld; \
+	  dh_apparmor -pmysql-server-5.6 --profile-name=usr.sbin.mysqld; \
 	fi
 
 override_dh_installchangelogs:
@@ -242,7 +243,7 @@ override_dh_installcron-arch:
 	dh_installcron --name mysql-server
 
 override_dh_makeshlibs-arch:
-	dh_makeshlibs -plibmysqlclient18 -V'libmysqlclient18 (>= 5.5.25a-1)'
+	dh_makeshlibs -plibmysqlclient18 -V'libmysqlclient18 (>= 5.6.8-rc+dfsg-1)'
 
 binary:	binary-indep binary-arch
 

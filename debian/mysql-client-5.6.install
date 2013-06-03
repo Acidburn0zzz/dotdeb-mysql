@@ -15,3 +15,4 @@ usr/bin/mysqlshow
 usr/bin/mysqlslap
 usr/bin/mysql_waitpid
 usr/bin/mysql_plugin
+usr/bin/mysql_config_editor
