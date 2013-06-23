@@ -1,3 +1,9 @@
+mysql-5.6 (5.6.12-1~dotdeb.1) stable; urgency=low
+
+  * New upstream release
+
+ -- Guillaume Plessis <gui@dotdeb.org>  Sun, 23 Jun 2013 11:03:42 -0700
+
 mysql-5.6 (5.6.11-1~dotdeb.1) stable; urgency=low
 
   * Rebuilt for Dotdeb against Wheezy
