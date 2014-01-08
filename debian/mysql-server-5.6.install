@@ -15,6 +15,7 @@ usr/bin/mysqld_multi
 usr/bin/mysqld_safe
 usr/bin/mysqlhotcopy
 usr/bin/mysqltest
+usr/bin/mysqltest_embedded
 usr/bin/perror
 usr/bin/replace
 usr/bin/resolve_stack_dump
@@ -25,6 +26,7 @@ usr/share/mysql/echo_stderr
 usr/share/mysql/errmsg-utf8.txt
 usr/share/mysql/mysqld_multi.server
 usr/share/mysql/mysql_test_data_timezone.sql
+usr/share/mysql/debian_create_root_user.sql
 #usr/share/mysql/config.huge.ini
 #usr/share/mysql/config.medium.ini
 #usr/share/mysql/config.small.ini
